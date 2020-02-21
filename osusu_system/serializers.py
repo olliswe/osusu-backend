@@ -1,11 +1,22 @@
 from rest_framework import serializers
-from .models import Tricycle, Garage, Payment, Claim
+from .models import Tricycle, Garage, Payment, Claim, PartClaim, Part
 
 # Serializers define the API representation.
-class TricycleSerializer(serializers.ModelSerializer):
+class TricycleWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tricycle
         fields = "__all__"
+
+
+class TricycleReadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tricycle
+        fields = [field.name for field in model._meta.fields]
+        fields.append("waiting_period")
+        fields.append("number_payments_made")
+        fields.append("total_value_of_payments_made_formatted")
+        fields.append("payments_up_to_date")
+        fields.append("outstanding_payments_formatted")
 
 
 class GarageSerializer(serializers.ModelSerializer):
@@ -20,7 +31,42 @@ class PaymentSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ClaimSerializer(serializers.ModelSerializer):
+class PartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Part
+        fields = [field.name for field in model._meta.fields]
+        fields.append("formatted_value")
+
+
+class PartClaimWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PartClaim
+        fields = "__all__"
+
+
+class PartClaimReadSerializer(serializers.ModelSerializer):
+    part = PartSerializer(many=False)
+
+    class Meta:
+        model = PartClaim
+        fields = [field.name for field in model._meta.fields]
+        fields.append("value")
+
+
+class ClaimReadSerializer(serializers.ModelSerializer):
+    tricycle = TricycleReadSerializer(many=False, read_only=True)
+    garage = GarageSerializer(many=False, read_only=True)
+    partclaims = PartClaimReadSerializer(many=True, source="partclaim_set")
+
+    class Meta:
+        model = Claim
+        fields = [field.name for field in model._meta.fields]
+        fields.append("id")
+        fields.append("partclaims")
+        fields.append("total_value")
+
+
+class ClaimWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Claim
         fields = "__all__"
