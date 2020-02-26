@@ -59,21 +59,56 @@ class Tricycle(models.Model):
 
     #####
 
+    @property
     def tot_claims(self):
-        # total number of claims
-        pass
+        return self.claim_set.all().count()
 
+    @property
     def total_value_claims(self):
-        # sum of value of all claims
-        pass
+        total = 0
+        for claim in self.claim_set.all():
+            total += claim.total_value
+        return "Le " + locale.format("%d", total, grouping=True)
 
+    @property
     def total_num_approved_claims(self):
-        pass
+        return self.claim_set.filter(status="Approved").count()
 
+    @property
     def total_val_approved_claims(self):
-        pass
+        total = 0
+        for claim in self.claim_set.filter(status="Approved"):
+            total += claim.total_value
+        return "Le " + locale.format("%d", total, grouping=True)
 
     ### ABOVE FUNCTIONS SHOULD BE REPEATED BUT FOR THE LAST 6 MONTHS
+    @property
+    def claims_6_months(self):
+        return self.claim_set.filter(
+            date__gt=datetime.today().date() - timedelta(days=30 * 6)
+        )
+
+    @property
+    def tot_claims_6_months(self):
+        return self.claims_6_months.count()
+
+    @property
+    def total_value_claims_6_months(self):
+        total = 0
+        for claim in self.claims_6_months:
+            total += claim.total_value
+        return "Le " + locale.format("%d", total, grouping=True)
+
+    @property
+    def total_num_approved_claims_6_months(self):
+        return self.claims_6_months.filter(status="Approved").count()
+
+    @property
+    def total_val_approved_claims_6_months(self):
+        total = 0
+        for claim in self.claims_6_months.filter(status="Approved"):
+            total += claim.total_value
+        return "Le " + locale.format("%d", total, grouping=True)
 
 
 class Garage(models.Model):
@@ -122,13 +157,18 @@ class Claim(models.Model):
     tricycle = models.ForeignKey(Tricycle, models.CASCADE)
     garage = models.ForeignKey(Garage, models.CASCADE)
     status = models.CharField(choices=STATUS_OPTIONS, max_length=50, default="Open")
+    date = models.DateField(auto_now_add=True)
 
     @property
     def total_value(self):
         amount = 0
         for partclaim in self.partclaim_set.all():
             amount += partclaim.part.value * partclaim.number
-        return "Le " + locale.format("%d", amount, grouping=True)
+        return amount
+
+    @property
+    def total_value_formatted(self):
+        return "Le " + locale.format("%d", self.total_value, grouping=True)
 
 
 class Part(models.Model):

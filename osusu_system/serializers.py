@@ -17,6 +17,14 @@ class TricycleReadSerializer(serializers.ModelSerializer):
         fields.append("total_value_of_payments_made_formatted")
         fields.append("payments_up_to_date")
         fields.append("outstanding_payments_formatted")
+        fields.append("tot_claims")
+        fields.append("total_value_claims")
+        fields.append("total_num_approved_claims")
+        fields.append("total_val_approved_claims")
+        fields.append("tot_claims_6_months")
+        fields.append("total_value_claims_6_months")
+        fields.append("total_num_approved_claims_6_months")
+        fields.append("total_val_approved_claims_6_months")
 
 
 class GarageSerializer(serializers.ModelSerializer):
