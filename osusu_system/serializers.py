@@ -14,9 +14,9 @@ class TricycleReadSerializer(serializers.ModelSerializer):
         fields = [field.name for field in model._meta.fields]
         fields.append("waiting_period")
         fields.append("number_payments_made")
-        fields.append("total_value_of_payments_made_formatted")
+        fields.append("total_value_of_payments_made")
         fields.append("payments_up_to_date")
-        fields.append("outstanding_payments_formatted")
+        fields.append("outstanding_payments")
         fields.append("tot_claims")
         fields.append("total_value_claims")
         fields.append("total_num_approved_claims")
@@ -30,10 +30,26 @@ class TricycleReadSerializer(serializers.ModelSerializer):
 class GarageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Garage
-        fields = "__all__"
+        fields = [field.name for field in model._meta.fields]
+        fields.append("total_no_claims")
+        fields.append("total_val_claims")
+        fields.append("total_num_approved_claims")
+        fields.append("total_val_approved_claims")
+        fields.append("total_num_open_claims")
+        fields.append("total_val_open_claims")
+        fields.append("total_num_approved_not_paid_claims")
+        fields.append("total_val_approved_not_paid_claims")
 
 
-class PaymentSerializer(serializers.ModelSerializer):
+class PaymentReadSerializer(serializers.ModelSerializer):
+    tricycle = TricycleReadSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = Payment
+        fields = [field.name for field in model._meta.fields]
+
+
+class PaymentWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
         fields = "__all__"
@@ -43,7 +59,6 @@ class PartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Part
         fields = [field.name for field in model._meta.fields]
-        fields.append("formatted_value")
 
 
 class PartClaimWriteSerializer(serializers.ModelSerializer):
@@ -70,8 +85,8 @@ class ClaimReadSerializer(serializers.ModelSerializer):
         model = Claim
         fields = [field.name for field in model._meta.fields]
         fields.append("id")
-        fields.append("partclaims")
         fields.append("total_value")
+        fields.append("partclaims")
 
 
 class ClaimWriteSerializer(serializers.ModelSerializer):
