@@ -156,6 +156,9 @@ class Payment(models.Model):
     )
     date = models.DateField(verbose_name="payment date")
 
+    class Meta:
+        ordering = ("-date",)
+
 
 class Claim(models.Model):
     STATUS_OPTIONS = [

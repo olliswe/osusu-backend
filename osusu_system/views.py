@@ -14,6 +14,7 @@ from .serializers import (
     PartSerializer,
 )
 from django_filters import rest_framework as df_filters
+from rest_framework.decorators import api_view
 
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
@@ -55,8 +56,9 @@ class GarageViewSet(viewsets.ModelViewSet):
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
     authentication_classes = [CsrfExemptSessionAuthentication]
-    filter_backends = [filters.OrderingFilter]
+    filter_backends = [df_filters.DjangoFilterBackend, filters.OrderingFilter]
     ordering_fields = "__all__"
+    filterset_fields = "__all__"
 
     def get_serializer_class(self):
         if self.request.method in ["GET"]:
@@ -67,8 +69,9 @@ class PaymentViewSet(viewsets.ModelViewSet):
 class ClaimsViewSet(viewsets.ModelViewSet):
     queryset = Claim.objects.all()
     authentication_classes = [CsrfExemptSessionAuthentication]
-    filter_backends = [filters.OrderingFilter]
+    filter_backends = [df_filters.DjangoFilterBackend, filters.OrderingFilter]
     ordering_fields = "__all__"
+    filterset_fields = "__all__"
 
     def get_serializer_class(self):
         if self.request.method in ["GET"]:
@@ -79,8 +82,9 @@ class ClaimsViewSet(viewsets.ModelViewSet):
 class PartClaimViewSet(viewsets.ModelViewSet):
     queryset = PartClaim.objects.all()
     authentication_classes = [CsrfExemptSessionAuthentication]
-    filter_backends = [filters.OrderingFilter]
+    filter_backends = [df_filters.DjangoFilterBackend, filters.OrderingFilter]
     ordering_fields = "__all__"
+    filterset_fields = "__all__"
 
     def get_serializer_class(self):
         if self.request.method in ["GET"]:
