@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Tricycle, Garage, Payment, Claim, PartClaim, Part
+from .models import Tricycle, Garage, Payment, Claim, PartClaim, Part, Fund
 
 # Serializers define the API representation.
 class TricycleWriteSerializer(serializers.ModelSerializer):
@@ -73,7 +73,6 @@ class PartClaimReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = PartClaim
         fields = [field.name for field in model._meta.fields]
-        fields.append("value")
 
 
 class ClaimReadSerializer(serializers.ModelSerializer):
@@ -92,4 +91,19 @@ class ClaimReadSerializer(serializers.ModelSerializer):
 class ClaimWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Claim
+        fields = "__all__"
+
+
+class FundReadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Fund
+        fields = ["id", "actual_amount"]
+        fields.append("required_amount")
+        fields.append("total_available_amount_month")
+        fields.append("remaining_available_amount_month")
+
+
+class FundWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Fund
         fields = "__all__"

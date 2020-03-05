@@ -2,6 +2,16 @@ from django.db import models
 from datetime import datetime, timedelta
 import locale
 from django.conf import settings
+import calendar
+from django.contrib.auth.models import User
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+
+
+@receiver(pre_save, sender="osusu_system.PartClaim")
+def set_value(sender, instance=None, created=False, **kwargs):
+    if not instance.value:
+        instance.value = instance.part.value * instance.number
 
 
 locale.setlocale(locale.LC_ALL, "")
@@ -191,11 +201,7 @@ class PartClaim(models.Model):
     number = models.IntegerField()
     part = models.ForeignKey(Part, verbose_name="Part", on_delete=models.CASCADE)
     claim = models.ForeignKey(Claim, models.CASCADE)
-
-    @property
-    def value(self):
-        amount = self.part.value * self.number
-        return "Le " + locale.format("%d", amount, grouping=True)
+    value = models.DecimalField(decimal_places=2, max_digits=100, null=True, blank=True)
 
 
 class Fund(models.Model):
@@ -203,14 +209,46 @@ class Fund(models.Model):
         verbose_name="Actual Amount (filled by bank)", decimal_places=2, max_digits=100
     )
 
+    @property
     def required_amount(self):
+        payments_made = 0
+        for payment in Payment.objects.all():
+            payments_made += payment.amount
+
+        approved_and_paid_claims = 0
+        for claim in Claim.objects.filter(status="Approved & Paid"):
+            approved_and_paid_claims += claim.total_value
         # sum of all payments made - sum of all claims with status 'approved & paid'
-        pass
+        return payments_made - approved_and_paid_claims
 
+    @property
     def total_available_amount_month(self):
-        # 60% of all payments in previous month
-        pass
+        current_month = datetime.today().month
+        current_year = datetime.today().year
+        if current_month == 1:
+            previous_month = 12
+            year = current_year - 1
+        else:
+            previous_month = current_month - 1
+            year = current_year
+        last_day_of_month = calendar.monthrange(year, previous_month)[1]
+        first_date_of_month = datetime(year, previous_month, 1)
+        last_date_of_month = datetime(year, previous_month, last_day_of_month)
+        payments = Payment.objects.filter(
+            date__gt=first_date_of_month, date__lt=last_date_of_month
+        )
+        total_payments = 0
+        for payment in payments:
+            total_payments += payment.amount
+        return 0.6 * float(total_payments)
 
+    @property
     def remaining_available_amount_month(self):
         # total_available_amount_month - sum of all claims of the current month with status 'approved'
-        pass
+        current_month = datetime.today().month
+        current_year = datetime.today().year
+        first_date_of_month = datetime(current_year, current_month, 1)
+        sum_of_claims = 0
+        for claim in Claim.objects.filter(date__gt=first_date_of_month):
+            sum_of_claims += float(claim.total_value)
+        return self.total_available_amount_month - sum_of_claims

@@ -13,10 +13,13 @@ router.register(r"payments", views.PaymentViewSet)
 router.register(r"claims", views.ClaimsViewSet)
 router.register(r"partclaims", views.PartClaimViewSet)
 router.register(r"parts", views.PartViewSet)
+router.register(r"funds", views.FundViewSet)
 
 
 urlpatterns = [
     url(r"^", include(router.urls)),
     url(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     url(r"^rest-auth/", include("rest_auth.urls")),
+    url(r"^fund-data/", views.get_fund_data),
+    url(r"^claims-data/", views.get_claims_data),
 ]
