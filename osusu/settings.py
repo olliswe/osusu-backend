@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 import datetime
+import django_heroku
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,7 +27,7 @@ SECRET_KEY = "frfh8cjmvq9bx!)mvg7_z$p!oswhi5-bf$j=kqdhn&(#glp5!f"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -136,3 +137,6 @@ REST_FRAMEWORK = {
 
 
 PAYMENT_AMOUNT_IN_LE = 100000
+
+
+django_heroku.settings(locals())
