@@ -223,19 +223,19 @@ class Fund(models.Model):
 
     @property
     def total_available_amount_month(self):
-        current_month = datetime.today().month
-        current_year = datetime.today().year
-        if current_month == 1:
-            previous_month = 12
-            year = current_year - 1
-        else:
-            previous_month = current_month - 1
-            year = current_year
-        last_day_of_month = calendar.monthrange(year, previous_month)[1]
-        first_date_of_month = datetime(year, previous_month, 1)
-        last_date_of_month = datetime(year, previous_month, last_day_of_month)
+        # current_month = datetime.today().month
+        # current_year = datetime.today().year
+        # if current_month == 1:
+        #     previous_month = 12
+        #     year = current_year - 1
+        # else:
+        #     previous_month = current_month - 1
+        #     year = current_year
+        # last_day_of_month = calendar.monthrange(year, previous_month)[1]
+        # first_date_of_month = datetime(year, previous_month, 1)
+        # last_date_of_month = datetime(year, previous_month, last_day_of_month)
         payments = Payment.objects.filter(
-            date__gt=first_date_of_month, date__lt=last_date_of_month
+            date__gt=datetime.today() - timedelta(days=30)
         )
         total_payments = 0
         for payment in payments:
@@ -249,6 +249,8 @@ class Fund(models.Model):
         current_year = datetime.today().year
         first_date_of_month = datetime(current_year, current_month, 1)
         sum_of_claims = 0
-        for claim in Claim.objects.filter(date__gt=first_date_of_month):
+        for claim in Claim.objects.filter(
+            date__gt=first_date_of_month, status="Approved"
+        ):
             sum_of_claims += float(claim.total_value)
         return self.total_available_amount_month - sum_of_claims
