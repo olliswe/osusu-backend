@@ -72,9 +72,11 @@ class PaymentFilter(df_filters.FilterSet):
         field_name="tricycle__full_name", lookup_expr="icontains"
     )
 
+    tricycle = df_filters.CharFilter(field_name="tricycle__id", lookup_expr="exact")
+
     class Meta:
         model = Payment
-        fields = ["tricycle__full_name"]
+        fields = ["tricycle__full_name", "tricycle"]
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
