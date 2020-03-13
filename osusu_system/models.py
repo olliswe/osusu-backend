@@ -186,8 +186,8 @@ class Claim(models.Model):
     def total_value(self):
         amount = 0
         for partclaim in self.partclaim_set.all():
-            amount += partclaim.part.value * partclaim.number
-        return amount
+            amount += partclaim.value * partclaim.number
+        return amount - 100000
 
 
 class Part(models.Model):
